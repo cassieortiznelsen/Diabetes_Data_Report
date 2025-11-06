@@ -1,0 +1,217 @@
+---
+title: "Health Indications for Diabetes - Data Visualization"
+author: "Cassandra Ortiz-Nelsen"
+date: "2025-11-05"
+output: html_document
+---
+<style>
+/* Box around data/output */
+.data-box {
+  border: 2px solid #4B0082;  /* Indigo border */
+  border-radius: 10px;
+  background-color: #f9f9ff;
+  padding: 15px;
+  margin: 15px 0;
+  font-family: 'Fira Code', monospace; /* Custom font for code/data */
+  font-size: 14px;
+}
+
+/* Bold headers */
+h1, h2, h3, h4 {
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+}
+
+/* Optionally change body font */
+body {
+  font-family: 'Georgia', serif;
+  font-size: 16px;
+}
+</style>
+```{r setup, load-csv, include=FALSE} 
+data <- read.csv("~/Shell Script Practice/Final_Project/raw_diabetes_dataset.csv", header = TRUE) 
+library(knitr)
+library(tidyverse) 
+library(dplyr) 
+library(gtsummary) 
+library(labelled)
+library(ggplot2)
+
+knitr::opts_chunk$set( 
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+
+# Introduction
+The dataset, "Diabetes Dataset: Predicting Diabetes Onset Based on Diagnostic Measures" is a very useful and popular tool for machine learning and health research pertaining to health indicators so health professionals can better predict this disease. The dataset is comprised of 768 female patient record data including blood glucose, insulin, body measurements etc. The outcome indicates if a patient has diabetes with a 1 or does not with a 0.
+
+# Variable Definitions
+Pregnancies: Number of times the patient has been pregnant.
+
+Glucose: Plasma glucose concentration after a 2-hour oral glucose tolerance test.
+
+BloodPressure: Diastolic blood pressure (mm Hg).
+
+SkinThickness: Triceps skinfold thickness (mm).
+
+Insulin: 2-hour serum insulin (mu U/ml).
+
+BMI: Body mass index (weight in kg/(height in m)^2).
+
+DiabetesPedigreeFunction: A function representing the patient’s diabetes pedigree (likelihood based on family history).
+
+Age: Age of the patient (years).
+
+Outcome: Binary outcome indicating the presence (1) or absence (0) of diabetes.
+
+Here is the link to the dataset: https://www.kaggle.com/datasets/hasibur013/diabetes-dataset
+
+# Analysis Objectives
+1.Summarize and model the distribution of important diagnostic health indicators.
+2.Explore relationships between predictors (such as glucose, BMI, or age) and diabetes.
+3.Build a reproducible workflow for exploratory data analysis for later predictive analytics in hospitals
+
+# Sample of Data
+```{r, load-data}
+here::i_am("Code_Final_Project.rmd")
+absolute_path_to_data <- here::here("raw_diabetes_dataset.csv")
+data <- read.csv("~/Shell Script Practice/Final_Project/raw_diabetes_dataset.csv", header = TRUE)
+glimpse(data)
+```
+
+```{r}
+
+var_label(data) <- list(
+  Pregnancies = "Pregnancies",
+  Glucose = "Glucose",
+  BloodPressure = "Blood Pressure",
+  SkinThickness = "Skin Thickness",
+  Insulin = "Insulin",
+  BMI = "BMI",
+  DiabetesPedigreeFunction = "Diabetes Pedigree Function",
+  Age = "Age",
+  Outcome = "Outcome"
+)
+#create descriptive table
+tbl_summary(data) %>% bold_labels()
+```
+# BMI and Glucose Distribution
+
+```{r}
+ggplot(data, aes(x = Glucose)) +
+  geom_histogram(binwidth = 10, fill = "green4", color = "green4", alpha = 0.8) +
+  labs(
+  title = "Distribution of Plasma Glucose Concentrations", subtitle = "Frequency of glucose values among study participants n=768", 
+       x = "Glucose (mg/dL)", 
+       y = "Frequency") +
+        theme_minimal()
+ggplot(data, aes(x = BMI)) +
+  geom_histogram(binwidth = 2, fill = "blue4", color = "blue4", alpha = 0.8) +
+  labs(
+    title = "Distribution of Body Mass Index (BMI)",
+    subtitle = "Frequency of BMI measurements across all study participants",
+    x = "BMI (kg/m^2)",
+    y = "Frequency",
+  ) +
+  theme_minimal()
+```
+# Diabetes Onset Outcome
+```{r}
+ggplot(data, aes(x = factor(Outcome), fill = factor(Outcome))) + geom_bar() + scale_fill_manual(values = c("0" = "green3", "1" = "red3")) + labs(title = "Diabetes Outcome Distribution", x = "Outcome (0 = No, 1 = Yes)", y = "Count") + theme_minimal() + theme(legend.position = "none")
+```
+# Scatterplot of Blood Sugar (glucose) vs Body Mass Index (BMI)
+```{r}
+ggplot(data, aes(x = Glucose, y = BMI, color = factor(Outcome))) + 
+geom_point(alpha = 0.7, size = 2) + geom_smooth(method = "lm", se = FALSE, linetype = "dashed") + scale_color_manual(values = c("0" = "blue3", "1" = "green3"), labels = c("No Diabetes", "Diabetes")) + 
+  
+  labs(title = "Relationship Between Plasma Glucose and BMI by Diabetes Status",
+  subtitle = "Higher glucose levels are associated with elevated BMI among diabetes-positive participants",
+  x = "Plasma Glucose (mg/dL)",
+  y = "BMI (kg/m^2)",
+  color = "Diabetes Diagnosis"
+)
+```
+
+```{r}
+#outcome distribution table
+outcome_table <- data %>%
+count(Outcome) %>%
+mutate(
+Percent = round(n / sum(n) * 100, 1),
+Outcome = ifelse(Outcome == 1, "Diabetes", "No Diabetes")
+)
+
+kable(outcome_table, caption = "Distribution of Diabetes Outcomes (0 = No, 1 = Yes)")
+
+#BMI categories
+data <- data %>%
+mutate(
+BMI_Category = case_when(
+BMI < 18.5 ~ "Underweight",
+BMI >= 18.5 & BMI < 25 ~ "Normal",
+BMI >= 25 & BMI < 30 ~ "Overweight",
+BMI >= 30 ~ "Obese"
+)
+)
+
+
+```
+
+```{r}
+#bmi category distribution table
+bmi_table <- data %>%
+count(BMI_Category) %>%
+mutate(Percent = round(n / sum(n) * 100, 1))
+
+kable(bmi_table, caption = "Distribution of BMI Categories")
+
+#glucose by outcome
+ggplot(data, aes(x = factor(Outcome), y = Glucose, fill = factor(Outcome))) +
+geom_boxplot(alpha = 0.8) +
+scale_fill_manual(values = c("0" = "green3", "1" = "red3")) +
+labs(
+title = "Boxplot of Glucose Levels by Diabetes Outcome",
+  subtitle = "Participants with diabetes show higher median glucose concentrations",
+  x = "Diabetes Status",
+  y = "Plasma Glucose (mg/dL)"
+)
+
+#bmi by outcome
+ggplot(data, aes(x = factor(Outcome), y = BMI, fill = factor(Outcome))) +
+geom_boxplot(alpha = 0.8) +
+scale_fill_manual(values = c("0" = "green3", "1" = "red3")) +
+labs(
+title = "BMI by Diabetes Outcome",
+x = "Diabetes Outcome (0 = No, 1 = Yes)",
+y = "Body Mass Index (BMI)"
+) +
+theme_minimal() +
+theme(legend.position = "none")
+```
+
+```{r}
+#Cross-tabulation BMI x Diabetes Onset
+crosstab <- data %>%
+group_by(BMI_Category, Outcome) %>%
+summarise(Count = n(), .groups = "drop") %>%
+mutate(Percent = round(Count / sum(Count) * 100, 1))
+
+kable(crosstab, caption = "Cross-tabulation of BMI Category and Diabetes Onset")
+```
+
+# Information about the Data
+
+This data set includes data from 768 female patient records, adapted from the National Institute of Diabetes and Digestive and Kidney Diseases (NIDDK). It provides insight for variables such as: age, BMI, glucose, blood pressure, and insulin. 
+
+This data can indicate whether a patient is more at risk for diabetes based on the limits acknowledged by physicians, further, this data set provides insight into prevention thresholds which is clinically meaningful. The data collected has an array of variables, yet is simple to work with in order to discover risk patterns.
+
+The participants range in age, with most participants 30-50 years of age. For glucose and BMI patterns, there are very clear differences when comparing which groups of participants suffer diabetes onset. Of course, BMI has been a diabetes indicator and will be modeled in this report. 
+
+To speak briefly on less discussed health indicators, skin thickness, blood pressure, the diabetes pedigree function and insulin are harder to attribute a clear pattern, so are more difficult indicators although useful to some degree. 
+
+A note on the participant health outcome distribution, it is mostly balanced with ~35% with outcome and ~65% without. This means the data set is robust, reducing bias.
+
+A cross tabulation analysis was run to illustrate the relationship between diabetes and BMI. This cross-tabulation clearly shows that with a greater prevalence of diabetes, the patients will most likely be on the higher end of the BMI range. Further, when someone is in the danger zone of the BMI range, they can start to take action to prevent diabetes if informed in time.
