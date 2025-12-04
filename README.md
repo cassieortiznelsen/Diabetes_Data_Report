@@ -3,41 +3,32 @@ Welcome to my Diabetes Data Analysis Project!
 
 Project Overview
 
-This project looks at a diabetes dataset to explore patient characteristics and outcomes with graphs
+This project is an analysis of a diabetes dataset intending 
+to compare patient outcomes and characteristics using crosstabulations, 
+charts, and graphs
 
-
-
-Build the Report
-
+To Build the Report:
 (Make sure R is installed with dplyr, knitr, and rmarkdown)
-
 From the project root, run:
 
 make run
 
+The report will appear in the report folder
 
-The report will appear in the report/ folder
-
-
-
-Reproducibility
-
-We use renv to make the project reproducible!
-
+Addressing Reproducibility:
+"renv"" is used to make the project reproducible
 Restore the environment with:
 
 make install
 
 
-Then build the report with:
+To Clean-Up use bash:
+make clean
 
+Then build the report with:
 make run
 
-Docker
-
-You can also build and run the project using Docker to avoid installing R or packages locally!
-
-
+[To avoid installing R locally and to build/run this project use Docker]
 
 What’s Included
 
