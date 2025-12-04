@@ -42,6 +42,8 @@ library(dplyr)
 library(gtsummary) 
 library(labelled)
 library(ggplot2)
+library(renv)
+renv::snapshot()
 
 # Wes Anderson palette (The Grand Budapest Hotel)
 wes_colors <- c("#FAD089", "#FF9C5B", "#F5634A", "#ED303C", "#3B8183")
@@ -50,7 +52,11 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+
+
 ```
+
+
 
 # Introduction
 The dataset, "Diabetes Dataset: Predicting Diabetes Onset Based on Diagnostic Measures" is a very useful and popular tool for machine learning and health research pertaining to health indicators so health professionals can better predict this disease. This report illustrates that with robust datasets, helpful charts and cross-tabulations are possible to visualize data and make decisions.
