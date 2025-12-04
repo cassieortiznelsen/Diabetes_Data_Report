@@ -1,60 +1,53 @@
-# Welcome to my Diabetes Data Analysis Project!
+Welcome to my Diabetes Data Analysis Project!
 
 
 Project Overview
 
-Welcome! This project explores a diabetes dataset to examine patient characteristics and outcomes.
-The goal is to produce clear tables and visualizations that summarize key variables, such as BMI and diabetes diagnosis. Think of it as a guided tour through the data, highlighting the insights that matter most.
-
-How to Build the Report
-
-1. Ensure R is installed along with the required packages: dplyr, knitr, and rmarkdown.
-
-2. From the project root, run:
-
-make
-
-(This command renders the report. Once finished, the HTML output will appear in the output/ folder.)
+This project looks at a diabetes dataset to explore patient characteristics and outcomes with graphs
 
 
-Part 2. Reproducibility With renv
 
-To make this project fully reproducible, we use renv. This ensures anyone can recreate 
-the same R package environment used for the analysis—no surprises, no missing packages.
+Build the Report
 
-1. Restore the R environment
+(Make sure R is installed with dplyr, knitr, and rmarkdown)
 
 From the project root, run:
 
+make run
+
+
+The report will appear in the report/ folder
+
+
+
+Reproducibility
+
+We use renv to make the project reproducible!
+
+Restore the environment with:
+
 make install
 
-(This executes renv::restore(), installing all required packages exactly as recorded in renv.lock.
-!! only restores packages, not generating the report !!
 
-2. Build the report
+Then build the report with:
 
-After restoring the environment, run:
+make run
 
-make
+Docker
 
-(This renders the report using the correct packages and saves it to the output/ folder.)
+You can also build and run the project using Docker to avoid installing R or packages locally!
 
 
-3. What’s included for reproducibility
 
-renv/ folder — contains project-specific libraries
+What’s Included
 
-renv.lock — tracks exact package versions
+The renv/ folder has project libraries
+renv.lock tracks package versions
+The Makefile helps restore packages and build the report
+The R Markdown file has all code and figures
 
-Makefile — provides commands for restoring packages and rendering the report
+Code and Data
 
-R Markdown report — all code, tables, and figures in one document
-
-Code Organization
-
-Tables: code/table_creation.R — generates descriptive tables
-
-Figures: code/figure_creation.R — generates plots and visualizations
-
-
-Data - The dataset is located at data/diabetes_dataset.csv.
+Tables: code/table_creation.R
+Figures: code/figure_creation.R
+Dataset: data/diabetes_dataset.csv
