@@ -20,12 +20,12 @@ WORKDIR /home/project
 # Copy project files into container
 COPY . /home/project
 
-# Install renv and restore environment
-RUN R -e "install.packages('renv', repos='https://cloud.r-project.org/')" \
+# Make sure report directory exists
+RUN mkdir -p /home/project/report
+
+# Install R packages: renv (restores environment) and optionally remotes
+RUN R -e "install.packages(c('renv','remotes'), repos='https://cloud.r-project.org/')" \
     && R -e "renv::restore(prompt = FALSE)"
-    
 
-# Default command: render your report
-CMD ["Rscript", "-e", "rmarkdown::render('Diabetes_Data_Analysis.rmd', output_dir='report')"]
-
-
+# Default command: render R Markdown report to report/
+CMD ["Rscript", "-e", "rmarkdown::render('Diabetes_Data_Analysis.rmd', output_file='/home/project/report/Diabetes_Data_Analysis.html')"]
